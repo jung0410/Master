@@ -4,12 +4,12 @@ import seaborn as sns
 import numpy as np
 from scipy.interpolate import griddata
 
-df = pd.read_csv('C:/Users/Win/Desktop/detect/grid_data_2.txt',sep='\t')
 
-# 데이터 확인 (열 이름 확인)
-print(df.columns)  # ['X', 'Y', 'H']가 출력되어야 함
-print(df)
+# 파일 경로 및 파일 이름 지정.
+file_path = 'C:/Users/Win/Desktop/detect/E4.txt'
 
+# 데이터 로드
+data = np.loadtxt(file_path, delimiter='\t')
 
 # Scatter Plot 생성
 plt.figure(figsize=(10, 8))
