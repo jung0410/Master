@@ -9,6 +9,12 @@ from scipy.fftpack import fft, fftfreq
 
 file_path = 'C:/Users/Win/Desktop/detect/E10.txt'
 
+##shallow
+
+# file_path = 'C:/Users/Win/Desktop/detect/D4.txt'
+# file_path = 'C:/Users/Win/Desktop/detect/E4.txt'
+
+
 # 데이터 로드
 data = np.loadtxt(file_path, delimiter='\t')
 t = data[:, 0]
