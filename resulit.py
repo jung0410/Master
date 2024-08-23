@@ -7,7 +7,7 @@ from scipy.interpolate import griddata
 
 # 파일 경로 및 파일 이름 지정.
 file_path = 'C:/Users/Win/Desktop/detect/E4.txt'
-
+df = pd.read_csv(file_path, delimiter='\t', names=['X', 'Y', 'H'])
 # 데이터 로드
 data = np.loadtxt(file_path, delimiter='\t')
 
