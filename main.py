@@ -32,8 +32,12 @@ data = np.loadtxt(file_path, delimiter='\t')
 # Band-Pass 필터를 설계하는 함수
 def butter_bandpass(lowcut, highcut, fs, order=5):
     nyq = 0.5 * fs  # 나이퀴스트 주파수
+    print(f"nayq {nyq}")
     low = lowcut / nyq
+    print(f"low {low}")
     high = highcut / nyq
+    print(f" high  { high }")
+    print()
     b, a = butter(order, [low, high], btype='band')
     return b, a
 
@@ -65,6 +69,7 @@ def find_peak_frequency(frequencies, amplitudes, low_freq, high_freq):
 
 # 시간 벡터와 진폭 데이터를 각각 분리
 time = data[:, 0]
+print(time)
 amplitude = data[:, 1]
 
 # DC offset 제거 (신호의 평균값 빼기)
@@ -72,9 +77,11 @@ amplitude = amplitude - np.mean(amplitude)
 
 # 샘플링 주기를 계산
 dt = time[1] - time[0]
+print(dt)
 
 # 샘플링 주파수를 계산
 Fs = 1.0 / dt
+print(f"fs입니다: {Fs}")
 
 # Band-Pass 필터링 수행
 lowcut = 300.0  # 낮은 컷오프 주파수 (Hz)
@@ -89,6 +96,7 @@ frequency = np.fft.fftfreq(n, d=dt)
 
 # 양의 주파수 성분만을 가져옴
 positive_freq = frequency[:n // 2]
+
 positive_amplitude = np.abs(amplitude_fft[:n // 2]) * (2.0 / n)
 
 # 시간 영역 신호와 주파수 스펙트럼을 플롯
