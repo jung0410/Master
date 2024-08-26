@@ -3,8 +3,15 @@ from scipy.signal import butter, filtfilt, find_peaks
 from scipy.fft import fft, fftfreq
 import matplotlib.pyplot as plt
 import pandas as pd
+import os
 
+def ensure_directory_exists(path):
+    # 디렉터리 경로 추출
+    directory = os.path.dirname(path)
 
+    # 디렉터리가 존재하지 않으면 생성
+    if not os.path.exists(directory):
+        os.makedirs(directory)
 
 def find_peak_frequency(frequencies, amplitudes, low_freq, high_freq):
     # 지정한 주파수 대역 내에서 피크를 찾습니다.
@@ -114,9 +121,10 @@ def process_and_find_peak(data, lowcut=300.0, highcut=30000.0, order=2):
 
 
 
-def process_and_find_peak_nograph(data, lowcut=300.0, highcut=30000.0, order=2):
+def process_and_find_peak_nograph(data,column, lowcut=300.0, highcut=30000.0, order=2):
     # time = data.iloc[:, 0]
     amplitude=data.iloc[:, 0]
+    # name=string(column)
 
     ####문제 발생### 매우 중요
     ### 이게 3초짜리 정보인지 6초짜리 정보인지 어덯게암??? 야 이게 중대 문제
@@ -177,6 +185,40 @@ def process_and_find_peak_nograph(data, lowcut=300.0, highcut=30000.0, order=2):
     #     print(f'Peak frequency within { lowcut_kHz} Hz and {highcut_kHz} Hz: {peak_freq:.2f} Hz')
     # else:
     #     print(f'No peak found within {lowcut_kHz} Hz and {highcut_kHz} Hz.')
+    # 그래프로 결과 시각화
+    plt.figure(figsize=(12, 6))
+    plt.subplot(1, 2, 1)
+    plt.plot(time, data, label='Original Signal')
+    plt.plot(time, filtered_data, label='Filtered Signal', color='red')
+    plt.xlabel('Time (seconds)')
+    plt.ylabel('Amplitude')
+    plt.title('Time Domain')
+    plt.legend()
+
+    plt.subplot(1, 2, 2)
+    plt.plot(positive_frequencies_kHz, positive_amplitudes, label='FFT of Filtered Signal')
+    if peak_freq:
+        plt.axvline(x=peak_freq, color='green', linestyle='--', label=f'Peak Frequency: {peak_freq:.2f} kHz')
+    plt.xlabel('Frequency (kHz)')
+    plt.xlim([0, 30])
+    plt.ylabel('Amplitude')
+    plt.title('Frequency Domain')
+    plt.legend()
+    plt.tight_layout()
+    # 파일 경로
+    file_path = f'C:/Users/Win/Desktop/data_result/{column}/{column}_Frequency_norm.jpg'
+
+    # 파일 경로에서 디렉터리 경로만 추출
+    directory = os.path.dirname(file_path)
+
+    # 해당 디렉터리가 존재하지 않는 경우 생성
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    plt.savefig(f'C:/Users/Win/Desktop/data_result/{column}/{column}_Frequency_norm.jpg')
+    plt.show()
+
+
     return peak_freq
 
 # 예제 사용

@@ -1,5 +1,6 @@
 import numpy as np
-from PyEMD import EMD
+from PyEMD.EMD import EMD
+
 import matplotlib.pyplot as plt
 from scipy.fftpack import fft, fftfreq
 
@@ -25,17 +26,20 @@ from scipy.fftpack import fft, fftfreq
 file_path = 'C:/Users/Win/Desktop/detect/E4.txt'
 # 데이터 로드
 data = np.loadtxt(file_path, delimiter='\t')
+print(data)
 t = data[:, 0]
 signal = data[:, 1]
 
 # EMD 객체 생성
 emd = EMD()
-
+print(t)
+print(signal)
 # IMF 분해 수행
 imfs = emd.emd(signal, t)
 
 # 샘플링 간격 계산 (t[1] - t[0]은 시간 간격)
 sampling_interval = t[1] - t[0]
+print(sampling_interval)
 
 # IMF 시각화 (시간 도메인)
 n_imfs = imfs.shape[0]
@@ -57,6 +61,7 @@ plt.grid(True)
 n = len(signal)
 signal_fft = fft(signal)
 frequency = fftfreq(n, d=sampling_interval)
+
 
 # 양수 주파수만 선택
 positive_freq = frequency[:n // 2]

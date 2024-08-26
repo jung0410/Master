@@ -52,10 +52,10 @@ def split_name(column_name):
 
 
 
-num_rows = 18
-num_cols = 13
+num_rows = 19
+num_cols = 15
 df=create_and_transpose_df(num_rows, num_cols)
 
 df.loc['13', 'A'] = 50
 df.loc['13', 'D'] = 30
-create_graph_2D(df)
+# create_graph_2D(df)

@@ -2,6 +2,19 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from lib.FFT_DATA import process_and_find_peak, process_and_find_peak_nograph
+from lib.ICA_seperate_data import seperate_and_find_peak
+import os
+from PyEMD.EMD import EMD  # 또는 적절한 경로
+
+
+
+def ensure_directory_exists(path):
+    # 디렉터리 경로 추출
+    directory = os.path.dirname(path)
+
+    # 디렉터리가 존재하지 않으면 생성
+    if not os.path.exists(directory):
+        os.makedirs(directory)
 
 ## 본 코드는 엑셀 파일을 읽고 데이터를 만드는 코드입니다.
 ## (엑셀 파일명만 넣어주면 됨)
@@ -89,10 +102,15 @@ def calculate_average_columns(df, base_name):
     return df
 
 ##peak 값으로 데이터 만들기
+##데이터에서 peak만구해줌
 
 def find_peaks_in_dataframe(df, lowcut, highcut, order):
     # 피크 값을 저장할 새 데이터 프레임 생성
+
+    ###peak_df는 그냥 비교
+    ###peak_sep_df는 분리 비교
     peaks_df = pd.DataFrame(index=['Peak'], columns=df.columns)
+    peaks_sep_df= pd.DataFrame(index=['Peak'], columns=df.columns)
 
     # df의 모든 열에 대해 반복
     for column in df.columns:
@@ -110,14 +128,19 @@ def find_peaks_in_dataframe(df, lowcut, highcut, order):
             # 이를 위해 데이터 프레임을 생성 (임시로 하나의 열만 있는 DataFrame 사용)
             temp_df = pd.DataFrame(clean_data)
             temp_df.columns = ['Data']
+            ###column은 이름 맞음
+            ###column을 string으로 만들어주고 저장해줌
 
             # 피크 찾기 함수 호출
-            peak = process_and_find_peak_nograph(temp_df, lowcut=lowcut, highcut=highcut, order=order)
+            peak = process_and_find_peak_nograph(temp_df,column, lowcut=lowcut, highcut=highcut, order=order)
+            peak_sep = seperate_and_find_peak(temp_df, column, lowcut=lowcut, highcut=highcut, order=order)
+
 
         # 피크 값을 peaks_df에 저장
         peaks_df.at['Peak', column] = peak
+        peaks_sep_df.at['Peak', column] =peak_sep
 
-    return peaks_df
+    return peaks_df,peaks_sep_df
 
 
 # 파일 경로 지정 및 함수 호출
@@ -126,7 +149,8 @@ custom_df = create_custom_df(file_path)
 # print(custom_df)
 
 # print(pd.DataFrame(custom_df["B1_1"]))
-peak=process_and_find_peak(pd.DataFrame(custom_df["D1_1"]), lowcut=300.0, highcut=30000.0, order=2)
+# peak=process_and_find_peak(pd.DataFrame(custom_df["D1_2"]), lowcut=300.0, highcut=30000.0, order=2)
+# peak2=seperate_and_find_peak(pd.DataFrame(custom_df["D1_2"]), lowcut=300.0, highcut=30000.0, order=2)
 # peaks_df = find_peaks_in_dataframe(custom_df, 300.0, 30000.0, 2)
 # print(peaks_df)
 # data_array = custom_df["A1_avg"].to_numpy()
