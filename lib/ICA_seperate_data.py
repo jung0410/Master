@@ -18,6 +18,27 @@ def ensure_directory_exists(path):
     if not os.path.exists(directory):
         os.makedirs(directory)
 
+def find_peak_frequency(frequencies, amplitudes, low_freq, high_freq):
+    # 지정한 주파수 대역 내에서 피크를 찾습니다.
+    mask = (frequencies >= low_freq) & (frequencies <= high_freq)
+    filtered_frequencies = frequencies[mask]
+    filtered_amplitudes = amplitudes[mask]
+
+    # 피크 찾기
+    peaks, _ = find_peaks(filtered_amplitudes)
+
+    if peaks.size > 0:
+        # 가장 큰 피크의 주파수를 반환
+        ###여기서 오류 발생
+        # max_peak_index = [np.argmax(filtered_amplitudes[peaks])]
+        peak_freq = filtered_frequencies[peaks[np.argmax(filtered_amplitudes[peaks])]]
+        max_peak_index = filtered_amplitudes[peaks[np.argmax(filtered_amplitudes[peaks])]]
+        return peak_freq,max_peak_index
+    else:
+        return None , None
+
+
+
 
 def seperate_and_find_peak(data,column, lowcut=300.0, highcut=30000.0, order=2):
     # time = data.iloc[:, 0]
@@ -38,7 +59,7 @@ def seperate_and_find_peak(data,column, lowcut=300.0, highcut=30000.0, order=2):
 
     # 샘플링 주기를 계산
     sampling_interval= time.loc[1, 0] - time.loc[0, 0]
-    print(sampling_interval)
+    # print(sampling_interval)
     time=np.array(time)
 
     # print(signal)
@@ -104,7 +125,7 @@ def seperate_and_find_peak(data,column, lowcut=300.0, highcut=30000.0, order=2):
             os.makedirs(directory)
 
         plt.savefig(f'C:/Users/Win/Desktop/data_result/{column}/seperate/sep_{column}_{num}_Domain_norm.jpg')
-        plt.show()
+        # plt.show()
         num +=1
 
 
@@ -123,7 +144,7 @@ def seperate_and_find_peak(data,column, lowcut=300.0, highcut=30000.0, order=2):
 
             # FFT 적용
             fft_values = fft(imfs[i])
-
+            # print(sampling_interval)
             # 주파수 벡터 계산
             freq = fftfreq(len(imfs[i]), d=sampling_interval)
             n=len(imfs[i])
@@ -131,37 +152,51 @@ def seperate_and_find_peak(data,column, lowcut=300.0, highcut=30000.0, order=2):
             # 양수 주파수만 표시
             ###데이터 비교 필요!!1
             ####여기 뭔가 이상함
-            # positive_freq_idx = freq > 0
-            # positive_freq = freq[positive_freq_idx] / 1000  # Hz -> kHz로 변환
-            # positive_amplitude = np.abs(fft_values[positive_freq_idx])
+            positive_freq_idx = freq > 0
+            # print(positive_freq_idx)
+            # positive_freq_idx = freq
+            positive_freq = freq[positive_freq_idx]/1000 # Hz -> kHz로 변환
+            # print(positive_freq )
+            positive_amplitude = np.abs(fft_values[positive_freq_idx])* (2.0 / n)
 
-            positive_freq_idx = freq[:n // 2]
-            ###에러 주의!!
-            positive_freq = positive_freq_idx / 1000
-            positive_amplitude = np.abs(fft_values[:n // 2]) * (2.0 / n)
+            # positive_freq_idx = freq[:n // 2]
+            # ###에러 주의!!
+            # positive_freq = positive_freq_idx / 1000
+            # positive_amplitude = np.abs(fft_values[:n // 2]) * (2.0 / n)
 
             # 최대 진폭을 가지는 주파수 찾기
-            max_amp_index = np.argmax(positive_amplitude)
-            max_amp_freq = positive_freq[max_amp_index]
-            max_amp_value = positive_amplitude[max_amp_index]
+            # max_amp_index = np.argmax(positive_amplitude)
+            # max_amp_freq = positive_freq[max_amp_index]
+            # max_amp_value = positive_amplitude[max_amp_index]
+
+            # 찾는 범위 또한 kHz 단위로 변환
+            lowcut_kHz = lowcut / 1000.0
+            # print(lowcut_kHz)
+            highcut_kHz = highcut / 1000.0
+            # print(highcut_kHz )
+            max_amp_freq,max_amp_value = find_peak_frequency(positive_freq, positive_amplitude, lowcut_kHz, highcut_kHz)
+            # print(max_amp_freq)
+            # print(max_amp_value)
+
 
             # 최대 주파수 출력
-            print(f"IMF {i + 1}: 최대 진폭을 가지는 주파수 = {max_amp_freq:.2f} kHz")
+            # print(f"IMF {i + 1}: 최대 진폭을 가지는 주파수 = {max_amp_freq:.2f} kHz")
             # 전체 IMF 중 최대 주파수를 추적
-            if max_amp_value > overall_max_amp:
+            if max_amp_value !=None and max_amp_value > overall_max_amp:
                 overall_max_amp = max_amp_value
                 overall_max_freq = max_amp_freq
 
             # 그래프 그리기
             plt.plot(positive_freq, positive_amplitude, label='Frequency Spectrum')
-            plt.scatter(max_amp_freq, max_amp_value, color='red', marker='o',
-                        label=f'Max Frequency: {max_amp_freq:.2f} kHz')
+            if max_amp_freq is not None:
+                plt.scatter(max_amp_freq, max_amp_value, color='red', marker='o',
+                            label=f'Max Frequency: {max_amp_freq:.2f} kHz')
 
             plt.title(f"IMF {i + 1} - Frequency Domain")
-            plt.xlabel("Frequency (Hz)")
+            plt.xlabel("Frequency (kHz)")
             plt.ylabel("Amplitude")
             ##x축 몇까지
-            plt.xlim([0, 100])
+            plt.xlim([0, 30])
             plt.legend()
 
         plt.tight_layout()
@@ -176,9 +211,9 @@ def seperate_and_find_peak(data,column, lowcut=300.0, highcut=30000.0, order=2):
             os.makedirs(directory)
 
         plt.savefig(f'C:/Users/Win/Desktop/data_result/{column}/seperate/sep_{column}_{i}_Frequency_norm.jpg')
-        plt.show()
+        # plt.show()
 
-    print(f'H치 최대값{overall_max_freq}')
+    # print(f'H치 최대값{overall_max_freq}')
     return overall_max_freq
 
 
@@ -242,5 +277,5 @@ def create_custom_df(file_path):
     return pd.DataFrame(df)
 file_path = "C:/Users/Win/Desktop/data/example_data.xlsx"
 custom_df = create_custom_df(file_path)
-peak1=process_and_find_peak_nograph(pd.DataFrame(custom_df["E1_2"]),"D1_2", lowcut=300.0, highcut=30000.0, order=2)
-peak2=seperate_and_find_peak(pd.DataFrame(custom_df["E1_2"]),"D1_2", lowcut=300.0, highcut=30000.0, order=2)
+peak1=process_and_find_peak_nograph(pd.DataFrame(custom_df["A1_avg"]),"D1_2", lowcut=300.0, highcut=30000.0, order=2)
+peak2=seperate_and_find_peak(pd.DataFrame(custom_df["A1_avg"]),"D1_2", lowcut=300.0, highcut=30000.0, order=2)

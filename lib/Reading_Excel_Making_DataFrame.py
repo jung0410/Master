@@ -146,6 +146,7 @@ def find_peaks_in_dataframe(df, lowcut, highcut, order):
 # 파일 경로 지정 및 함수 호출
 file_path = "C:/Users/Win/Desktop/data/example_data.xlsx"
 custom_df = create_custom_df(file_path)
+print(custom_df)
 # print(custom_df)
 
 # print(pd.DataFrame(custom_df["B1_1"]))

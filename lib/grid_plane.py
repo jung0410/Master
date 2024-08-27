@@ -7,8 +7,8 @@ def create_and_transpose_df(num_rows, num_cols):
     # 행 이름 생성: 'A', 'B', ..., 'R' (알파벳 18개)
     row_names = [chr(i) for i in range(ord('A'), ord('A') + num_rows)]
 
-    # 열 이름 생성: '1', '2', ..., '13'
-    col_names = [str(i) for i in range(1, num_cols + 1)]
+    # 열 이름 생성: '13', '12', ..., '1'
+    col_names = [str(i) for i in range(num_cols, 0, -1)]
 
 
 

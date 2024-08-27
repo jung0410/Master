@@ -132,17 +132,17 @@ def process_and_find_peak_nograph(data,column, lowcut=300.0, highcut=30000.0, or
     length_of_data = len(amplitude)
     Hz_given=400000
     sample_given=3000
-    print(length_of_data)
+    # print(length_of_data)
     time = np.arange(0, sample_given/ Hz_given , 1 / Hz_given)
     time=pd.DataFrame(time)
-    print(time)
+    # print(time)
     # 샘플링 주기를 계산
     dt = time.loc[1, 0] - time.loc[0, 0]
-    print(dt)
+    # print(dt)
 
     # 샘플링 주파수를 계산
     fs = 1.0 / dt
-    print(fs)
+    # print(fs)
 
     # DC offset 제거 (신호의 평균값 빼기)
     amplitude = amplitude - np.mean(amplitude)
@@ -152,13 +152,13 @@ def process_and_find_peak_nograph(data,column, lowcut=300.0, highcut=30000.0, or
     ### 예시 데이터에서 하기에 넣음
     ### 어지간히 데이터가 안터지면 사용 안 될 듯
     nyq = 0.5 * fs
-    print(nyq)
+    # print(nyq)
     low = lowcut / nyq
-    print(low)
+    # print(low)
     high = highcut / nyq
 
     b, a = butter(order, [low, high], btype='band')
-    print(b)
+    # print(b)
     filtered_data = filtfilt(b, a, amplitude)
 
     # FFT 수행
@@ -216,7 +216,7 @@ def process_and_find_peak_nograph(data,column, lowcut=300.0, highcut=30000.0, or
         os.makedirs(directory)
 
     plt.savefig(f'C:/Users/Win/Desktop/data_result/{column}/{column}_Frequency_norm.jpg')
-    plt.show()
+    # plt.show()
 
 
     return peak_freq

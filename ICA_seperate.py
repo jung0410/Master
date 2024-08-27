@@ -115,6 +115,7 @@ for start in range(0, imfs.shape[0], 4):
 
         # 주파수 벡터 계산
         freq = fftfreq(len(imfs[i]), d=sampling_interval)
+        N = len(imfs[i])
 
         # 양수 주파수만 표시
         positive_freq_idx = freq > 0
@@ -124,7 +125,7 @@ for start in range(0, imfs.shape[0], 4):
         # 최대 진폭을 가지는 주파수 찾기
         max_amp_index = np.argmax(positive_amplitude)
         max_amp_freq = positive_freq[max_amp_index]
-        max_amp_value = positive_amplitude[max_amp_index]
+        max_amp_value = positive_amplitude[max_amp_index]* (2.0 / N)
 
         # 최대 주파수 출력
         print(f"IMF {i + 1}: 최대 진폭을 가지는 주파수 = {max_amp_freq:.2f} kHz")
